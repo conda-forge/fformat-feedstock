@@ -15,8 +15,14 @@ if sys.platform == "win32":
     env.setdefault("OS", "Windows_NT")
 env["FPM_FC"] = os.environ.get("FC", "gfortran")
 # the archiver and C compiler of the toolchain too: otherwise fpm picks its own, on Windows the
-# MSVC `lib`, which is not there (the fpm feedstock sets these as well)
-env["FPM_AR"] = os.environ.get("AR", "ar")
+# MSVC `lib`, which is not there (the fpm feedstock sets these as well). On macOS `llvm-ar`, not
+# the cctools `ar` of $AR: with an archiver given, fpm 0.13.0 decides whether to pass the object
+# files in a response file (`@file`) from an uninitialized variable (fixed in fortran-lang/fpm#1389),
+# and the cctools `ar` does not read those, while `llvm-ar` does
+if sys.platform == "darwin":
+    env["FPM_AR"] = "llvm-ar"
+else:
+    env["FPM_AR"] = os.environ.get("AR", "ar")
 if "CC" in os.environ:
     env["FPM_CC"] = os.environ["CC"]
 env["FPM_FFLAGS"] = os.environ.get("FFLAGS", "")

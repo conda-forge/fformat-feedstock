@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: fformat
-  version: "1.0.1"
+  version: "1.0.3"
 
 package:
   name: ${{ name }}
@@ -12,7 +12,7 @@ package:
 # does for Rust packages; their licenses are included below
 source:
   url: https://github.com/jacobwilliams/fformat/archive/refs/tags/${{ version }}.tar.gz
-  sha256: cb3a14c21b545548abd1e30a440d3ba10dba512273835ae90f8de788b068edf1
+  sha256: 5766a437844232d0229ce7227ff13cca353c1145caa66d4c3ef87dac1e3f501e
 
 build:
   number: 0
@@ -29,6 +29,9 @@ requirements:
       else:
         - ${{ compiler('fortran') }}
         - ${{ stdlib('c') }}
+    # llvm-ar: the archiver on macOS (see build.py)
+    - if: osx
+      then: llvm-tools
     - fpm >=0.13.0,<0.14
     - git
     - python >=3.9
