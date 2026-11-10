@@ -13,6 +13,10 @@ if sys.platform == "win32":
     # fpm detects Windows from OS=Windows_NT, which the build environment does not pass on;
     # without it, fpm takes the system for Unix and runs Unix commands (`mkdir -p`)
     env.setdefault("OS", "Windows_NT")
+    # fpm 0.13.0 on MinGW can corrupt its heap in libgfortran's save and restore of the locale
+    # around formatted I/O (fixed in fortran-lang/fpm#1377), mostly when its threads do that at
+    # once; one thread makes that rare
+    env["OMP_NUM_THREADS"] = "1"
 env["FPM_FC"] = os.environ.get("FC", "gfortran")
 # the archiver and C compiler of the toolchain too: otherwise fpm picks its own, on Windows the
 # MSVC `lib`, which is not there (the fpm feedstock sets these as well). On macOS `llvm-ar`, not
